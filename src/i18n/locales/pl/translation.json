@@ -1310,6 +1310,7 @@
   "launcherUpdate.channelStable": "Stable",
   "launcherUpdate.channelBeta": "Beta",
   "launcherUpdate.channelSwitchInfo": "Wybrać ten kanał aktualizacji? Nie rozpocznie to pobierania ani nie uruchomi launchera ponownie. Następnie wybierz Sprawdź i Pobierz.",
+  "launcherUpdate.channelSelected": "Kanał wybrany. Wybierz Sprawdź, aby znaleźć aktualizację.",
   "launcherUpdate.restartTitle": "Aktualizacja gotowa",
   "launcherUpdate.restartInfo": "Wersja {{version}} została pobrana. Uruchomić launcher ponownie teraz? Wybierz Później, aby zainstalować aktualizację przy następnym uruchomieniu launchera.",
   "launcherUpdate.restartNow": "Uruchom ponownie teraz",

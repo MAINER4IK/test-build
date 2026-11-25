@@ -1252,6 +1252,7 @@
   "launcherUpdate.channelStable": "Stable",
   "launcherUpdate.channelBeta": "Beta",
   "launcherUpdate.channelSwitchInfo": "Выбрать эту ветку обновлений? Это не начнёт скачивание и не перезапустит лаунчер. Затем нажмите «Проверить» и «Загрузить».",
+  "launcherUpdate.channelSelected": "Ветка выбрана. Нажмите «Проверить», чтобы найти обновление.",
   "launcherUpdate.restartTitle": "Обновление готово",
   "launcherUpdate.restartInfo": "Версия {{version}} скачана. Перезапустить лаунчер сейчас? Если выбрать «Позже», обновление применится при следующем запуске лаунчера.",
   "launcherUpdate.restartNow": "Перезапустить сейчас",

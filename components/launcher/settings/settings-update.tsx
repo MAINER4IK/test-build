@@ -51,6 +51,7 @@ export function SettingsUpdate() {
   const [channel, setChannel] = useState<UpdateChannel>("stable")
   const [pendingChannel, setPendingChannel] = useState<UpdateChannel | null>(null)
   const [savingChannel, setSavingChannel] = useState(false)
+  const [channelNotice, setChannelNotice] = useState<string | null>(null)
   const [restartPrompt, setRestartPrompt] = useState(false)
   const [deferred, setDeferred] = useState(false)
   const [deferring, setDeferring] = useState(false)
@@ -130,6 +131,7 @@ export function SettingsUpdate() {
         setRemoteVersion(null)
         setProgress(null)
         setDeferred(false)
+        setChannelNotice(t("launcherUpdate.channelSelected"))
         setErrorMsg(null)
       }
     } catch (error) {
@@ -254,6 +256,10 @@ export function SettingsUpdate() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {channelNotice && (
+        <p data-ui="settings-settings-update-p-5" data-settings-tone="green" className="text-xs leading-relaxed text-primary">{channelNotice}</p>
+      )}
 
       <div data-ui="settings-settings-update-div-12" className="border-t border-border" />
 
