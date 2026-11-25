@@ -198,8 +198,9 @@ describe("repository identity: границы runtime и CI", () => {
   })
 
   test("runtime не содержит чужого owner/repo, а RetroAuth остаётся внешней зависимостью", async () => {
-    const { resolveRepositoryIdentity } = await import("../../scripts/repository-identity.ts")
-    const current = resolveRepositoryIdentity()
+    // Идентичность самой сборки берём из сгенерированного модуля, а не из живого env/git:
+    // так тест не зависит от порядка тестов и перегенерации файла.
+    const { repository: current } = await import("../../electrobun/main/repository-identity.ts")
     // Чужой — любой известный slug, кроме идентичности этой сборки. Свой slug живёт только в сгенерированном файле.
     const foreign = [OFFICIAL, PERSONAL_FORK].filter(slug => slug !== current)
     const offenders = []
