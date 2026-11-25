@@ -41,7 +41,7 @@ jobs:
       - name: Check release channel
         run: bun scripts/ci-release.ts channel
       - name: Check version tag and main ancestry before the protected release
-        if: github.repository == 'MAINER4IK/Xneon-Launcher-bun' && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: bun scripts/ci-release.ts guard-tag
@@ -72,8 +72,7 @@ jobs:
   build:
     needs: tests
     if: >-
-      ${{ github.repository == 'MAINER4IK/Xneon-Launcher-bun' &&
-          (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') }}
+      ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
     name: Windows build (${{ matrix.target }})
     strategy:
       fail-fast: false
@@ -147,8 +146,7 @@ jobs:
   build-linux:
     needs: tests
     if: >-
-      ${{ github.repository == 'MAINER4IK/Xneon-Launcher-bun' &&
-          (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') }}
+      ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
     name: Linux build (x64)
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -210,8 +208,7 @@ jobs:
   build-macos:
     needs: tests
     if: >-
-      ${{ github.repository == 'MAINER4IK/Xneon-Launcher-bun' &&
-          (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') }}
+      ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
     name: macOS build (ARM64)
     runs-on: macos-26
     timeout-minutes: 60
@@ -284,7 +281,7 @@ jobs:
 
   release:
     needs: [tests, build, build-linux, build-macos]
-    if: github.repository == 'MAINER4IK/Xneon-Launcher-bun' && startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: pre2-signing

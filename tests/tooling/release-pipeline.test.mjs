@@ -7,7 +7,9 @@ import { loadReactModule } from '../helpers/react-module.mjs'
 
 const root = path.resolve(import.meta.dir, '../..')
 const pipeline = () => import('../../scripts/ci-pipeline.ts')
-const repository = 'MAINER4IK/Xneon-Launcher-bun'
+const { resolveRepositoryIdentity } = await import('../../scripts/repository-identity.ts')
+// Репозиторий этой копии: официальный или форк — тест не должен зависеть от владельца.
+const repository = resolveRepositoryIdentity()
 const read = file => fs.readFile(path.join(root, file), 'utf8')
 const workflow = async file => Bun.YAML.parse(await read(`.github/workflows/${file}`))
 
@@ -15,16 +17,17 @@ test('identity, каналы и имена публикаций согласов
   const { releaseIdentity, releaseChannel, assertReleaseChannel, publicationNames } = await pipeline()
   const { compareReleaseVersions } = await import('../../electrobun/main/verified-update-manifest.ts')
   const { releaseChannelOf, installedPreference } = await import('../../electrobun/main/verified-update-feed.ts')
-  const { updateBaseUrls } = await import('../../electrobun/main/update-public-keys.ts')
+  const { updateBaseUrls } = await import('../../electrobun/main/repository-identity.ts')
   const { releaseChannelTargets } = await import('../../scripts/verify-signed-update-feed.ts')
   const { releaseTargets } = await import('../../scripts/release-targets.ts')
 
   assert.deepEqual(releaseIdentity('refs/tags/v1.2.3', '1.2.3', repository), { tag: 'v1.2.3', version: '1.2.3', prerelease: false })
   assert.deepEqual(releaseIdentity('refs/tags/v1.2.3-pre2', '1.2.3-pre2', repository), { tag: 'v1.2.3-pre2', version: '1.2.3-pre2', prerelease: true })
   assert.equal(releaseIdentity('refs/tags/v1.0.8-beta1', '1.0.8-beta1', repository).prerelease, true)
+  const foreign = repository === 'XneonTeam/Xneon-Launcher' ? 'fork/repo' : 'XneonTeam/Xneon-Launcher'
   for (const args of [
     ['refs/heads/main', '1.2.3', repository], ['refs/tags/v1.2.4', '1.2.3', repository],
-    ['refs/tags/v1.2.3', '1.2.3', 'fork/repo'], ['refs/tags/v1.2.3-pre0', '1.2.3-pre0', repository],
+    ['refs/tags/v1.2.3', '1.2.3', foreign], ['refs/tags/v1.2.3-pre0', '1.2.3-pre0', repository],
   ]) assert.throws(() => releaseIdentity(...args))
 
   assert.equal(releaseChannel('1.2.3'), 'stable')
@@ -40,8 +43,8 @@ test('identity, каналы и имена публикаций согласов
   assert.ok(compareReleaseVersions('1.0.8-beta2', '1.0.8-beta1') > 0)
   assert.ok(compareReleaseVersions('1.0.8-pre1', '1.0.8-beta99') > 0)
   assert.ok(compareReleaseVersions('1.0.8', '1.0.8-beta2') > 0)
-  assert.equal(updateBaseUrls.stable, 'https://github.com/MAINER4IK/Xneon-Launcher-bun/releases/latest/download')
-  assert.equal(updateBaseUrls.canary, 'https://github.com/MAINER4IK/Xneon-Launcher-bun/releases/download/canary')
+  assert.equal(updateBaseUrls.stable, `https://github.com/${repository}/releases/latest/download`)
+  assert.equal(updateBaseUrls.canary, `https://github.com/${repository}/releases/download/canary`)
 
   for (const [version, channel] of [['1.2.3', 'stable'], ['1.2.3-pre1', 'canary']]) {
     const suffix = channel === 'canary' ? '-canary' : ''
@@ -253,7 +256,8 @@ test('release guard поддерживает оба вида tags, запрещ�
   const release = loadReactModule(new URL('../../scripts/ci-pipeline.ts', import.meta.url), {
     '../package.json': { version: '1.2.3' },
   }, { Bun, Buffer, process: { env }, fetch: async url => {
-    const resource = url.split('/repos/' + repository + '/')[1]
+    const current = env.GITHUB_REPOSITORY
+    const resource = url.split('/repos/' + current + '/')[1]
     if (resource === 'releases/tags/v1.2.3') return { status: existing }
     const responses = {
       'git/ref/tags/v1.2.3': { object: { type: annotated ? 'tag' : 'commit', sha: commit } },
@@ -275,8 +279,11 @@ test('release guard поддерживает оба вида tags, запрещ�
   commit = 'b'.repeat(40)
   await assert.rejects(release.guardReleaseTag(), /moved/)
   commit = sha
+  // Форк — такой же полноправный репозиторий сборки: guard проверяет его, а не официальный.
   env.GITHUB_REPOSITORY = 'fork/repo'
-  await assert.rejects(release.guardReleaseTag())
+  await release.guardReleaseTag()
+  env.GITHUB_REPOSITORY = repository
+  assert.throws(() => release.releaseIdentity('refs/tags/v1.2.3', '1.2.3', 'unexpected/repo'), /belongs to/)
 })
 
 test('macOS metadata wrapper сверяет bundle с проверенным manifest и версией пакета', async t => {

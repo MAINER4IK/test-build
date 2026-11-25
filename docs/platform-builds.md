@@ -77,6 +77,12 @@ Signing/publish не запускается при PR, обычном push ил�
 Environment `pre2-signing` должен разрешать защищённые version tags с approval;
 сохраните в нём secret `XNLC_UPDATE_PRIVATE_KEY` и variable `XNLC_UPDATE_KEY_ID`.
 
+**Идентичность репозитория сборки.** `owner/repo` берётся из `GITHUB_REPOSITORY`
+(Actions), `XNLC_REPOSITORY` (явная локальная сборка) или git remote `origin`/`upstream`;
+генератор `scripts/gen-repository-identity.ts` встраивает её в бандл, и из неё строятся
+Stable/Canary URL, allowlist редиректов и ссылки в About. Поэтому форк собирает и
+подписывает собственный фид без правок исходников, а runtime не зависит от Git.
+
 **Ротация ключа подписи.** Доверие пинится в `electrobun/main/update-public-keys.ts`
 и попадает в собранный бандл вместе с приложением: подпись проверяет *установленная*
 сборка, а не CI. Поэтому новый ключ можно добавлять в реестр заранее, но переключать
