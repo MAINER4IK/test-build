@@ -12,4 +12,8 @@ export const updatePublicKeys: Readonly<Record<string, string>> = Object.freeze(
   // Действующий ключ подписи stable/canary. Сгенерирован после компрометации
   // предыдущего ключа 28ed; приватная часть хранится только в environment pre2-signing.
   "ed25519-437dba728abbaeaf511d0d1e": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAEV22gpLFFZI4qj2Wpx08/SqlcQJ2SmucQtX3ZrO40+g=\n-----END PUBLIC KEY-----\n",
+  // Тестовый ключ приёмки переноса репозитория: подписывает только сборки
+  // MAINER4IK/test-build. Приватная часть лежит в environment pre2-signing этого
+  // тестового репозитория и не совпадает с production-ключом.
+  "ed25519-1ba3de883155153b440bd1c1": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAZb/qcRYYPbrG6DTDSvDJ0CLoX4vmt36WrXqYQa52d0M=\n-----END PUBLIC KEY-----\n",
 })
