@@ -43,8 +43,10 @@ test('identity, каналы и имена публикаций согласов
   assert.ok(compareReleaseVersions('1.0.8-beta2', '1.0.8-beta1') > 0)
   assert.ok(compareReleaseVersions('1.0.8-pre1', '1.0.8-beta99') > 0)
   assert.ok(compareReleaseVersions('1.0.8', '1.0.8-beta2') > 0)
+  const buildVersion = JSON.parse(await read('package.json')).version
   assert.equal(updateBaseUrls.stable, `https://github.com/${repository}/releases/latest/download`)
-  assert.equal(updateBaseUrls.canary, `https://github.com/${repository}/releases/download/canary`)
+  // Canary читает релиз конкретной версии: каждый prerelease публикуется отдельно, rolling-тега canary больше нет.
+  assert.equal(updateBaseUrls.canary, `https://github.com/${repository}/releases/download/v${buildVersion}`)
 
   for (const [version, channel] of [['1.2.3', 'stable'], ['1.2.3-pre1', 'canary']]) {
     const suffix = channel === 'canary' ? '-canary' : ''
